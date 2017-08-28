@@ -1,8 +1,8 @@
-const { Composer } = require("micro-bot");
+const { Composer } = require('micro-bot');
 
 const bot = new Composer();
 
-const DeadOrAliveService = require("./DeadOrAliveService");
+const DeadOrAliveService = require('./DeadOrAliveService');
 
 bot.on('text', async (context) => {
     const message = context.message;
