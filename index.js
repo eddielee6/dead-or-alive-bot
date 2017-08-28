@@ -1,24 +1,19 @@
 const { Composer } = require("micro-bot");
 
-// let config = process.env;
-// if (!config.TELEGRAM_TOKEN) {
-//     config = require("./config");
-// }
-
-const bot = new Composer(); 
-// Telegraf(process.env.TELEGRAM_TOKEN || config.TELEGRAM_TOKEN);
+const bot = new Composer();
 
 const DeadOrAliveService = require("./DeadOrAliveService");
 
-bot.on("text", async context => {
+bot.on('text', async (context) => {
     const message = context.message;
     let searchTerm = message.text;
     if (message.entities !== undefined && message.entities.length > 0) {
         const commandOffset = message.entities[0];
         const command = searchTerm.substring(commandOffset.offset, commandOffset.length);
-        if (command === "/dead" || command === "/alive") {
+        if (command === '/dead' || command === '/alive') {
             // strip out command from message
-            searchTerm = searchTerm.substring(commandOffset.offset + commandOffset.length + 1, searchTerm.length);
+            const start = commandOffset.offset + commandOffset.length + 1;
+            searchTerm = searchTerm.substring(start, searchTerm.length);
         } else {
             // ignore all other commands
             return;
@@ -27,7 +22,7 @@ bot.on("text", async context => {
 
     try {
         const deadOrAliveService = new DeadOrAliveService();
-        let result = await deadOrAliveService.search(searchTerm);
+        const result = await deadOrAliveService.search(searchTerm);
         let response = null;
         if (result && result.isDead) { // dead
             response = `[${result.name}](${result.wikipediaUrl}) died aged ${result.age} on ${result.dateOfDeath}.`;
@@ -36,11 +31,10 @@ bot.on("text", async context => {
         } else { // not found
             response = `Couldn't find a person named ${searchTerm}.`;
         }
-        return context.replyWithMarkdown(response);
+        context.replyWithMarkdown(response);
     } catch (e) {
-        return context.reply("Oops, something went wrong.");
+        context.reply('Oops, something went wrong.');
     }
 });
 
 module.exports = bot;
-// bot.startPolling();
