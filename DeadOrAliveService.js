@@ -28,7 +28,8 @@ class DeadOrAliveService {
         }
         const entityIds = searchResult.data.search.map(entity => {
             return entity.id;
-        });
+        })
+        .slice(0, 5);
         
         // get person entity from search results
         const entities = await this.getEntities(entityIds);
@@ -37,7 +38,7 @@ class DeadOrAliveService {
             const instanceOfValue = entity.claims.P31[0].mainsnak.datavalue.value.id;
             return instanceOfValue === "Q5";
         });
-        if (!personEntity) {
+        if (personEntity === undefined || personEntity.sitelinks.enwiki === undefined) {
             return null;
         }
 
