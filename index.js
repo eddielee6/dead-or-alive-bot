@@ -11,25 +11,35 @@ const bot = new Composer();
 const DeadOrAliveService = require("./DeadOrAliveService");
 
 bot.on("text", async context => {
-    let message = context.message;
+    const message = context.message;
     let searchTerm = message.text;
     if (message.entities !== undefined && message.entities.length > 0) {
-        let commandOffset = message.entities[0];
-        searchTerm = searchTerm.substring(commandOffset.offset + commandOffset.length, searchTerm.length - 1);
+        const commandOffset = message.entities[0];
+        const command = searchTerm.substring(commandOffset.offset, commandOffset.length);
+        if (command === "/dead" || command === "/alive") {
+            // strip out command from message
+            searchTerm = searchTerm.substring(commandOffset.offset + commandOffset.length + 1, searchTerm.length);
+        } else {
+            // ignore all other commands
+            return;
+        }
     }
 
-    const deadOrAliveService = new DeadOrAliveService();
-    let result = await deadOrAliveService.search(searchTerm);
-    let response = null;
-    if (result && result.isDead) { // dead
-        response = `${result.name} died aged ${result.age} on ${result.dateOfDeath}.`;
-    } else if (result && !result.Dead) { // alive
-        response = `${result.name} is alive and kicking and ${result.age} years old.`;
-    } else { // not found
-        response = `Couldn't find a person named ${searchTerm}.`;
+    try {
+        const deadOrAliveService = new DeadOrAliveService();
+        let result = await deadOrAliveService.search(searchTerm);
+        let response = null;
+        if (result && result.isDead) { // dead
+            response = `[${result.name}](${result.wikipediaUrl}) died aged ${result.age} on ${result.dateOfDeath}.`;
+        } else if (result && !result.Dead) { // alive
+            response = `[${result.name}](${result.wikipediaUrl}) is alive and kicking and ${result.age} years old.`;
+        } else { // not found
+            response = `Couldn't find a person named ${searchTerm}.`;
+        }
+        return context.replyWithMarkdown(response);
+    } catch (e) {
+        return context.reply("Oops, something went wrong.");
     }
-
-    return context.reply(response);
 });
 
 module.exports = bot;
