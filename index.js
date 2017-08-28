@@ -1,11 +1,12 @@
-const Telegraf = require("telegraf");
+const { Composer } = require("micro-bot");
 
-let config = process.env;
-if (!config.TELEGRAM_TOKEN) {
-    config = require("./config");
-}
+// let config = process.env;
+// if (!config.TELEGRAM_TOKEN) {
+//     config = require("./config");
+// }
 
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN || config.TELEGRAM_TOKEN);
+const bot = new Composer(); 
+// Telegraf(process.env.TELEGRAM_TOKEN || config.TELEGRAM_TOKEN);
 
 const DeadOrAliveService = require("./DeadOrAliveService");
 
@@ -28,4 +29,5 @@ bot.on("text", context => {
     });
 });
 
-bot.startPolling();
+module.exports = bot;
+// bot.startPolling();
